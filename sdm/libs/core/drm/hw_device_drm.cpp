@@ -74,6 +74,12 @@
 #ifndef DRM_FORMAT_MOD_QCOM_TIGHT
 #define DRM_FORMAT_MOD_QCOM_TIGHT fourcc_mod_code(QCOM, 0x4)
 #endif
+#ifndef DRM_MODE_FLAG_SUPPORTS_YUV422
+#define DRM_MODE_FLAG_SUPPORTS_YUV422 (1<<21)
+#endif
+#ifndef DRM_MODE_FLAG_SUPPORTS_YUV420
+#define DRM_MODE_FLAG_SUPPORTS_YUV420 (1<<22)
+#endif
 
 using std::string;
 using std::to_string;
@@ -1166,6 +1172,11 @@ void HWDeviceDRM::SetSolidfillStages() {
   }
 }
 
+void HWDeviceDRM::ClearSolidfillStages() {
+  solid_fills_.clear();
+  SetSolidfillStages();
+}
+
 DisplayError HWDeviceDRM::Validate(HWLayers *hw_layers) {
   DTRACE_SCOPED();
 
@@ -1319,6 +1330,7 @@ DisplayError HWDeviceDRM::AtomicCommit(HWLayers *hw_layers) {
 
 DisplayError HWDeviceDRM::Flush(HWLayers *hw_layers) {
   DTRACE_SCOPED();
+  ClearSolidfillStages();
   int ret = drm_atomic_intf_->Commit(false /* synchronous */, false /* retain_planes*/);
   if (ret) {
     DLOGE("failed with error %d", ret);
