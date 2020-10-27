@@ -36,6 +36,7 @@
 #include "hwc_buffer_allocator.h"
 #include "hwc_callbacks.h"
 #include "hwc_layers.h"
+#include "display_null.h"
 
 using android::hardware::graphics::common::V1_1::RenderIntent;
 
@@ -185,6 +186,7 @@ class HWCDisplay : public DisplayEventHandler {
   bool IsSkipValidateState() { return (validate_state_ == kSkipValidate); }
   bool IsInternalValidateState() { return (validated_ && (validate_state_ == kInternalValidate)); }
   void SetValidationState(DisplayValidateState state) { validate_state_ = state; }
+  bool CommitPending() { return pending_commit_;}
 
   // HWC2 APIs
   virtual HWC2::Error AcceptDisplayChanges(void);
@@ -351,6 +353,7 @@ class HWCDisplay : public DisplayEventHandler {
   bool pending_commit_ = false;
   LayerRect window_rect_ = {};
   bool skip_commit_ = false;
+  DisplayNull display_null_;
 
  private:
   void DumpInputBuffers(void);
